@@ -1,0 +1,5 @@
+image_repo: richardchesterwood
+numberofreplicas: 2
+
+#Whether it is a dev env or prod env, boolean can be used
+environment: no

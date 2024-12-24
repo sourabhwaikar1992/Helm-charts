@@ -1,0 +1,29 @@
+---
+- name: Install Helm Charts on Minikube
+  hosts: all
+  vars:
+    charts_dir: "/home/swaikar/charts/mysql"  # Change this to the absolute path
+  tasks:
+    - name: Ensure Helm is installed
+      command: helm version
+      register: helm_version
+      failed_when: helm_version.rc != 0
+
+    - name: List chart directories
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ lookup('fileglob', charts_dir + '/*, wantlist=True') }}"
+
+    - name: Install Helm chart from a directory
+      kubernetes.core.helm:
+        name: "{{ item | basename }}"
+        chart: "{{ item }}"
+        state: present
+        wait: yes
+        timeout: 600
+      loop: "{{ lookup('fileglob', charts_dir + '/*, wantlist=True') }}"
+      when: item is directory
+
+    - name: Notify completion
+      debug:
+        msg: "All charts installed successfully."
